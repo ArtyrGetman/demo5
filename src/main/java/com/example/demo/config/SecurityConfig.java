@@ -26,9 +26,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors()
+                .and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/auth").permitAll()
+                .antMatchers("/auth/**").permitAll()
                 .antMatchers("/students").authenticated()
                 .anyRequest().permitAll()
                 .and()
@@ -45,10 +47,12 @@ public class SecurityConfig {
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.setAllowedOriginPatterns(List.of("*"));
-        config.setAllowedHeaders(List.of("Origin", "Content-Type", "Accept", "Authorization"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowCredentials(true); // ✅ Дозволяємо кукі та заголовки
+        config.setAllowedOrigins(List.of("http://localhost:3000")); // ✅ Дозволяємо тільки frontend
+        config.setAllowedHeaders(List.of("*")); // ✅ Дозволяємо всі заголовки
+        config.setExposedHeaders(List.of("Authorization")); // ✅ Дозволяємо `Authorization`
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // ✅ Дозволяємо `OPTIONS`
+
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }

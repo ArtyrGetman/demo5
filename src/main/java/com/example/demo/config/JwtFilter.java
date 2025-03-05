@@ -17,6 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Enumeration;
 
 @Slf4j
 @Component
@@ -35,12 +36,20 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
+
+        Enumeration<String> headerNames = request.getHeaderNames();
+        System.out.println("📡 Отримані заголовки:");
+        while (headerNames.hasMoreElements()) {
+            String headerName = headerNames.nextElement();
+            System.out.println(headerName + ": " + request.getHeader(headerName));
+        }
         // ✅ Отримуємо `Authorization` заголовок з HTTP-запиту
         String authHeader = request.getHeader("Authorization");
         // ✅ Перевіряємо, чи є заголовок та чи починається з "Bearer "
         if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7); // Видаляємо "Bearer "
+            String token = authHeader.substring(7).trim(); // Видаляємо "Bearer "
             if (!token.equals("null") &&  !token.isEmpty()) {
+                log.info("+++"+token+"+++");
                 String username = jwtUtil.extractUserName(token); // Отримуємо username з токена
                 log.info("JWT токен отримано. Username: {}", username);
                 // Якщо токен дійсний, додаємо користувача у SecurityContextHolder
