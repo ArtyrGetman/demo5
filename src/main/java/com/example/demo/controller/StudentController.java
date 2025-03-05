@@ -21,14 +21,15 @@ public class StudentController {
     private StudentRepository repository;
 
     @GetMapping
-    public List<Student> getAllStudents() {
+    public ResponseEntity<?> getAllStudents() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) {
+        if (auth == null || !auth.isAuthenticated()) {
             log.info("Користувач НЕ АВТОРИЗОВАНИЙ. Доступ до /students заборонений!");
-            return null;
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Необхідна авторизація!");
         }
         log.info("✅ Користувач {} отримує список студентів", auth.getName());
-        return repository.findAll();
+        List<Student> students = repository.findAll();
+        return ResponseEntity.ok(students);
     }
 
     @PostMapping
