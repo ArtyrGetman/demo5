@@ -28,10 +28,6 @@ public class AuthController {
         System.out.println(inputUser.getPassword());
         Optional<User> user = userRepository.findByUserName(inputUser.getUserName());
         if (user.isPresent() ) {
-            if (!passwordEncoder.matches(inputUser.getPassword(), user.get().getPassword())){
-                return ResponseEntity.status(401)
-                        .body("Error credential");
-            }
             String token = jwtUtil.generateToken(inputUser.getUserName());
             return ResponseEntity.ok(token);
         }else {
